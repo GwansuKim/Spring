@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yedam.boot.emp.mapper.EmpMapper">
+	<!--  전체조회 -->
+	<select id="selectEmpAllList" resultType="EmpVO">
+		<!-- cId -> setCId() : cid -->
+		SELECT employee_id, 
+			   first_name,
+			   last_name,
+			   email,
+			   phone_number,
+			   hire_date,
+			   job_id,
+			   salary,
+			   commission_pct,
+			   manager_id,
+			   department_id
+		 FROM employees
+		ORDER BY employee_id 
+	</select>
+	
+	<!-- 단건조회 -->
+	<select id="selectEmpInfo" resultType="EmpVO">
+		SELECT employee_id, 
+			   first_name,
+			   last_name,
+			   email,
+			   phone_number,
+			   hire_date,
+			   job_id,
+			   salary,
+			   commission_pct,
+			   manager_id,
+			   department_id
+		 FROM employees
+		 WHERE employee_id = #{ employeeId }
+		ORDER BY employee_id
+	<!-- #{ } : PreparedStatement 0 -> 0, Kang -> 'Kang'
+		 ${ } : 0 -> 0, Kang -> Kang -->
+	</select>
+	
+	<!-- 등록 -->
+	<insert id="insertEmpInfo" parameterType="EmpVO">
+		<selectKey keyProperty="employeeId" resultType="int" order="BEFORE">
+			SELECT NVL(MAX(employee_id),0) + 1 FROM employees
+		</selectKey>
+		INSERT INTO employees (employee_id, first_name, last_name, email, hire_date, job_id, salary)
+			           VALUES (#{employeeId}, #{firstName}, #{lastName}, #{email}, sysdate, #{jobId}, #{salary})		
+	</insert>
+	
+	<!-- 수정 : 급여를 정해진 비율로 인상 -->
+	<update id="updateEmpSal">
+		UPDATE employees
+		SET salary = salary * (1 + #{raise}/100)
+		WHERE employee_id = #{empId}
+	</update>	
+	
+	<!--  수정 : 사원 정보 수정 -->
+	<!--  1) 모든 항목에 업데이트 진행, 전제조건 : 모든 항목에 정보가 존재 -->
+	<!--  2) Mybatis -> Dynamic SQL 사용 -->
+	<update id="updateEmpInfo" parameterType="EmpVO">
+		UPDATE employees
+		<set>
+			<if test="firstName != null and !firstName.equals('')">
+				first_name = #{firstName},
+			</if>
+			<if test="email != null and !email.equals('')">
+				email = #{email},
+			</if>
+			<if test="salary > 0">
+				salary = #{salary},
+			</if>
+		</set>
+		WHERE employee_id = #{employeeId}
+	</update>
+	
+	<!-- 삭제 -->
+	<delete id="deleteEmpInfo" parameterType="int">
+		DELETE FROM employees
+		WHERE employee_id = #{employeeId}
+	</delete>
+	
+	<insert id="insertPlant" parameterType="Plant">
+		INSERT INTO plant(CNTNTS_NO, CNTNTS_SJ)
+		VALUES ( #{cntntsNo}, #{cntntsSj} )
+	</insert>
+	
+	<select id="getAllPlant" resultType="Plant">
+		SELECT CNTNTS_NO
+		  FROM plant
+		 ORDER BY cntnts_no
+	</select>
+	
+	<insert id="insertPlantInfo" parameterType="Plant">
+		UPDATE plant
+		   SET FML_CODE_NM = #{fmlCodeNm}
+			 , SMELL_CODE_NM = #{smellCodeNm}
+			 , TOXCTY_INFO = #{toxctyInfo}
+			 , MANAGELEVEL_CODE_NM = #{managelevelCodeNm}
+			 , MANAGEDEMANDDO_CODE_NM = #{managedemanddoCodeNm}
+			 , GRWTVE_CODE_NM = #{grwtveCodeNm}
+			 , GRWH_TP_CODE_NM = #{grwhTpCodeNm}
+			 , WINTER_LWET_TP_CODE_NM = #{winterLwetTpCodeNm}
+			 , HD_CODE_NM = #{hdCodeNm}
+			 , FRTLZR_INFO = #{frtlzrInfo}
+			 , WATERCYCLE_SPRNG_CODE_NM = #{watercycleSprngCodeNm}
+			 , WATERCYCLE_SUMMER_CODE_NM = #{watercycleSummerCodeNm}
+			 , WATERCYCLE_AUTUMN_CODE_NM = #{watercycleAutumnCodeNm}
+			 , WATERCYCLE_WINTER_CODE_NM = #{watercycleWinterCodeNm}
+		 WHERE CNTNTS_NO = #{cntntsNo}
+	</insert>
+	
+	<select id="insertPlantImg" parameterType="Plant">
+		INSERT INTO plant_img
+		VALUES ( #{cntntsNo}, #{rtnFileUrl} )
+	</select>
+	
+</mapper>

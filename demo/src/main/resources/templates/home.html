@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+  <head>
+    <script
+      src="https://code.jquery.com/jquery-3.6.4.min.js"
+      integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8="
+      crossorigin="anonymous"
+    ></script>
+    <title>Spring Security Example</title>
+  </head>
+  <body>
+    <h1>Welcome!</h1>
+
+    <p>Click <a th:href="@{/hello}">here</a> to see a greeting.</p>
+  </body>
+  <script>
+    $.ajax({
+      url: "http://api.nongsaro.go.kr/service/garden/gardenList?apiKey=20230426FGRJ3HQO0UAETES4TYIW",
+      method: "GET",
+      success: function (data) {
+        console.log(data);
+      },
+      error: function (reject) {
+        console.log(reject);
+      },
+    });
+  </script>
+</html>

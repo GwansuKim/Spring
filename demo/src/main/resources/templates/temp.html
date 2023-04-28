@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{template/layout}"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <title>Insert title here</title>
+    <!-- jQuery CDN -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- jQuery UI CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <!-- jQuery UI CSS CDN -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css"
+    />
+    <!-- codemirror CDN URL -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.4/codemirror.min.css"
+    />
+    <!-- Editor's Style -->
+    <link
+      rel="stylesheet"
+      href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css"
+    />
+  </head>
+  <body layout:fragment="content">
+    <div id="editor"></div>
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <script>
+      const editor = new toastui.Editor({
+        el: document.querySelector("#editor"),
+        previewStyle: "vertical",
+        height: "500px",
+        initialEditType: "wysiwyg",
+        hooks: {
+          addImageBlobHook: (blob, callback) => {
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+            // blob : Java Script 파일 객체
+            //console.log(blob);
+
+            const formData = new FormData();
+            formData.append("image", blob);
+
+            let url = "images/";
+            $.ajax({
+              type: "POST",
+              enctype: "multipart/form-data",
+              url: "test",
+              data: formData,
+              beforeSend: function (xhr) {
+                /*데이터를 전송하기 전에 헤더에 csrf값을 설정한다*/
+                xhr.setRequestHeader(header, token);
+              },
+              //dataType: "json",
+              processData: false,
+              contentType: false,
+              cache: false,
+              success: function (data) {
+                data = JSON.parse(data);
+                url += data.filename;
+                callback(url, "");
+              },
+              error: function (e) {
+                callback("image_load_fail", "사진 대체 텍스트 입력");
+              },
+            });
+          },
+        },
+      });
+    </script>
+  </body>
+</html>

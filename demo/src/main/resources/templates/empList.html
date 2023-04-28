@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{template/layout}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+.sprite {
+	background-color: yellowGreen
+}
+</style>
+</head>
+<body>
+	<div layout:fragment="content">
+		<div th:text="${#request.contextPath}">컨텍스트패스</div>
+		[[${#request.contextPath}]]
+		<!--/* <th:block th:each="emp : ${empList}" >
+		[[${emp.firstName}]]
+	</th:block> */-->
+		<br> properties : [[#{site.upload}]]<br> [( ${'<font
+			color=red>test</font>'} )] <span
+			th:utext="${'<font color=red>test</font>'}"></span> 전체 사원수 : <span
+			th:text="${#lists.size(empList)}">10명</span>
+
+		<table>
+			<tr>
+				<th>no</th>
+				<th>employee_id</th>
+				<th>first_name</th>
+				<th>last_name</th>
+			</tr>
+			<tr th:each="emp, st : ${empList}" th:class="${st.odd}?sprite:_">
+				<td th:text="${st.count}"></td>
+				<td th:text="${emp.employeeId}"></td>
+				<td><a th:href="|update?empid=${emp.employeeId}|"
+					th:text="${emp.firstName}">사원명</a> <a
+					th:href="@{update(empid=${emp.employeeId}, fname=${emp.firstName})}"
+					th:text="${emp.firstName}">사원명</a></td>
+				<td th:text="${emp.lastName}"></td>
+				<td th:text="${#dates.format(emp.hireDate, 'yyyy-MM-dd') }"></td>
+				<td
+					th:text="${#numbers.formatDecimal(emp.salary, 3, 'COMMA', 0, 'POINT')}"></td>
+				<td><button th:if="${emp.salary}>10000">수정</button></td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>
